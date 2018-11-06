@@ -1,0 +1,89 @@
+.model huge
+
+.stack 100h
+
+.data 
+    number dw 0h
+    tmp dw 0h
+    num dw 0h
+
+.code 
+    MAIN proc
+    mov ax, @DATA
+    mov ds, ax
+
+    mov ah, 1
+    READ:
+        int 21h
+        cmp al, 0dh
+        jz NEXT
+        sub al, 48
+        mov bl, al 
+        mov bh, 0
+        mov ax, number
+        mov cx, 10
+        mul cx
+        add ax, bx
+        mov number, ax
+        mov ah, 1
+        jmp READ
+    NEXT:
+        mov ah, 2
+        mov dl, 0dh       
+        int 21h
+        mov dl, 0ah 
+        int 21h
+              
+              
+    mov dx, number
+    mov num, dx   
+    call PRINT
+   
+    mov ah, 4ch
+    int 21h
+    MAIN endp
+
+    REVERSE proc  
+        mov cx, 10
+        mov tmp, 0
+        START:    
+            mov ax, num  
+            mov dx, 0
+            div cx
+            mov bx, dx 
+            mov num, ax
+            mov ax, tmp
+            mul cx
+            add ax, bx
+            mov tmp, ax
+            cmp num, 0 
+            jnz START
+            mov dx, tmp
+            mov num, dx
+            ret
+    REVERSE endp
+
+    PRINT proc 
+        call REVERSE
+        mov cx, 10
+        START1:
+            mov ax, num  
+            mov dx, 0
+            div cx
+            mov tmp, dx
+            mov num, ax
+            mov dl, tmp
+            add dl, 48
+            mov ah, 02
+            int 21h
+            cmp num, 0
+            jnz START1
+            mov ah, 2
+            mov dl, 0dh       
+            int 21h
+            mov dl, 0ah 
+            int 21h
+            ret
+    PRINT endp
+
+end MAIN
